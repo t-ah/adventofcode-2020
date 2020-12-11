@@ -6,41 +6,42 @@ def read_input():
 def count_occupied(seats, row, column):
     count = 0
     for dx, dy in ((-1,-1),(-1,0),(-1,1),(0,-1),(0,1),(1,-1),(1,0),(1,1)):
-        if seats[row + dx][column + dy] == "#":
-            count += 1
+        y = row
+        x = column
+        while True:
+            y = y + dy
+            x = x + dx
+            if x < 0 or y < 0 or y >= len(seats) or x >= len(seats[0]):
+                break
+            seat = seats[y][x]
+            if seat == "#":
+                count += 1
+                break
+            if seat == "L":
+                break
     return count
 
 def apply_rules(seats):
     new_seats = []
     changes = 0
-    for row_i in range(1, len(seats) - 1):
+    for row_i in range(len(seats)):
         new_row = []
         new_seats.append(new_row)
-        for col_i in range(1, len(seats[0]) - 1):
+        for col_i in range(len(seats[0])):
             seat = seats[row_i][col_i]
             new_seat = seat
             if seat == "L":
                 if count_occupied(seats, row_i, col_i) == 0:
                     new_seat = "#"
                     changes += 1
-            elif seat == "#" and count_occupied(seats, row_i, col_i) >= 4:
+            elif seat == "#" and count_occupied(seats, row_i, col_i) >= 5:
                 new_seat = "L"
                 changes += 1
             new_row.append(new_seat)
-    add_padding(new_seats)
     return changes, new_seats
-
-def add_padding(seats):
-    width = len(seats[0])
-    seats.insert(0, ["."] * width)
-    seats.append(["."] * width)
-    for row in seats:
-        row.insert(0, ".")
-        row.append(".")
 
 def main():
     seats = read_input()
-    add_padding(seats)
 
     while True:
         changes, seats = apply_rules(seats)
