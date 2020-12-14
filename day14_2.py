@@ -21,12 +21,9 @@ def main():
     for line in lines:
         if line[0] == "mask":
             mask = line[1]
+            print(pow(2, mask.count("X")))
         else:
-            addr = line[0][4:-1]
-            bit_str = to_bit_str(line[1])
-            masked_bit_str = apply_mask(bit_str, mask)
-            mem[addr] = masked_bit_str
-    print(sum([bit_str_to_int(x) for x in mem.values()]))
+            pass
 
 if __name__ == "__main__":
     main()
