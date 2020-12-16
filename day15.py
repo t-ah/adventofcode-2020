@@ -1,9 +1,16 @@
-def read_input():
-    with open(__file__.replace("py", "txt"), "r") as f:
-        return f.read().split("\n")
+# starting_numbers = [0,3,6]
+starting_numbers = [2,1,10,11,0,6]
 
-def main():
-    lines = read_input()
+mem = {}
+for i in range(len(starting_numbers)):
+    mem[starting_numbers[i]] = i
 
-if __name__ == "__main__":
-    main()
+prev = starting_numbers[-1]
+prev_new = starting_numbers.count(prev) == 1
+
+for i in range(len(starting_numbers), 30000000):
+    n = 0 if prev_new else (i - 1) - mem[prev]
+    mem[prev] = i - 1
+    prev = n
+    prev_new = n not in mem
+print(prev)
