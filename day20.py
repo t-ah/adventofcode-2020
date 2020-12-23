@@ -12,21 +12,21 @@ class Tile:
         self.fixed = False
 
     def rotate(self):
-        self.content = ["".join([line[i] for line in self.content])[::-1] for i in range(len(self.content))]
+        self.content = rotate_lines(self.content)
         temp = self.borders
         self.borders = [temp[3]] + temp[:3]
         for i in range(4):
             self.borders[i].direction = i
 
     def flip_horizontal(self):
-        self.content = [line[::-1] for line in self.content]
+        self.content = flip_lines_horizontal(self.content)
         self.borders[1], self.borders[3] = self.borders[3], self.borders[1]
         for i in range(4):
             self.borders[i].layout = self.borders[i].layout[::-1]
             self.borders[i].direction = i
 
     def flip_vertical(self):
-        self.content.reverse()
+        self.content = flip_lines_vertical(self.content)
         self.borders[0], self.borders[2] = self.borders[2], self.borders[0]
         for i in range(4):
             self.borders[i].layout = self.borders[i].layout[::-1]
@@ -43,6 +43,7 @@ class Border:
         self.connected = other_border
         other_border.connected = self
 
+# assume 'tile' is fixed and adjust neighbouring tiles recursively
 def fix_orientations(tile):
     tile.fixed = True
     for direction in range(4):
@@ -65,11 +66,13 @@ def fix_orientations(tile):
 def rotate_lines(lines):
     return ["".join([line[i] for line in lines])[::-1] for i in range(len(lines))]
 
-def flip_lines(lines):
+def flip_lines_vertical(lines):
     return list(reversed(lines))
 
+def flip_lines_horizontal(lines):
+    return [line[::-1] for line in lines]
+
 def search_sea_monster(lines):
-    # print("Looking for monsters")
     count = 0
     monster = set()
     for i in range(2, len(lines)):
@@ -82,9 +85,10 @@ def search_sea_monster(lines):
                     monster.update([(i-2,s+18), (i-1,s), (i-1,s+5), (i-1,s+6), (i-1,s+11), (i-1,s+12), (i-1,s+17), (i-1,s+18), (i-1,s+19), (i,s+1), (i,s+4), (i,s+7), (i,s+10), (i,s+13), (i,s+16)])
                     count += 1
     if count > 0:
-        # print("\n".join(lines))
         result = sum([line.count("#") for line in lines]) - len(monster)
         print(result)
+        return True
+    return False
 
 def main():
     raw_tiles = [x.split("\n") for x in read_input().split("\n\n")]
@@ -147,11 +151,13 @@ def main():
 
     for _ in range(4):
         lines = rotate_lines(lines)
-        search_sea_monster(lines)
-    lines = flip_lines(lines)
+        if search_sea_monster(lines):
+            break
+    lines = flip_lines_horizontal(lines)
     for _ in range(4):
         lines = rotate_lines(lines)
-        search_sea_monster(lines)
+        if search_sea_monster(lines):
+            break
 
 if __name__ == "__main__":
     main()
